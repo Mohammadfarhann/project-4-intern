@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    
+    .container {
+        background-color: #fff;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        padding: 20px;
+        width: 300px;
+        text-align: center;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    .task-form {
+        margin-top: 20px;
+    }
+    
+    input[type="text"] {
+        width: 60%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007BFF;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    #task-list {
+        margin-top: 20px;
+        text-align: left;
+    }
+    
+    .task-item {
+        display: flex;
+        justify-content: space-between;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 5px 0;
+        padding: 10px;
+    }
+    
+    .task-text {
+        flex: 1;
+    }
+    
+    .edit-button, .delete-button {
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        margin-left: 10px;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    
+    .edit-button:hover, .delete-button:hover {
+        background-color: #0056b3;
+    }
+    
+</style>
+</head>
+    
+
+
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <div id="task-list">
+            <!-- Task items will be added here dynamically -->
+        </div>
+        <div class="task-form">
+            <input type="text" id="task-input" placeholder="Add a new task">
+            <button id="add-task">Add Task</button>
+        </div>
+    </div>
+
+    <script>
+        const taskList = document.getElementById("task-list");
+        const taskInput = document.getElementById("task-input");
+        const addTaskButton = document.getElementById("add-task");
+
+        // Function to load tasks from local storage
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            tasks.forEach(task => addTask(task));
+        }
+
+        // Function to add a new task
+        function addTask(taskText) {
+            const taskItem = document.createElement("div");
+            taskItem.classList.add("task-item");
+
+            const taskTextElement = document.createElement("div");
+            taskTextElement.classList.add("task-text");
+            taskTextElement.innerText = taskText;
+
+            const editButton = document.createElement("button");
+            editButton.innerText = "Edit";
+            editButton.classList.add("edit-button");
+
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Delete";
+            deleteButton.classList.add("delete-button");
+
+            taskItem.appendChild(taskTextElement);
+            taskItem.appendChild(editButton);
+            taskItem.appendChild(deleteButton);
+
+            taskList.appendChild(taskItem);
+
+            // Add event listeners for editing and deleting tasks
+            editButton.addEventListener("click", () => editTask(taskTextElement, taskText));
+            deleteButton.addEventListener("click", () => deleteTask(taskItem, taskText));
+
+            taskInput.value = "";
+
+            // Save the updated task list to local storage
+            saveTasks();
+        }
+
+        // Function to edit a task
+        function editTask(taskTextElement, taskText) {
+            const newText = prompt("Edit task:", taskText);
+            if (newText !== null) {
+                taskTextElement.innerText = newText;
+                saveTasks();
+            }
+        }
+
+        // Function to delete a task
+        function deleteTask(taskItem, taskText) {
+            if (confirm(`Are you sure you want to delete "${taskText}"?`)) {
+                taskList.removeChild(taskItem);
+                saveTasks();
+            }
+        }
+
+        // Function to save tasks to local storage
+        function saveTasks() {
+            const tasks = Array.from(taskList.querySelectorAll(".task-text")).map(taskTextElement => taskTextElement.innerText);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        // Event listener for adding a new task
+        addTaskButton.addEventListener("click", () => {
+            const taskText = taskInput.value.trim();
+            if (taskText !== "") {
+                addTask(taskText);
+            }
+        });
+
+        // Load tasks from local storage when the page loads
+        loadTasks();
+    </script>
+    
+</body>
+</html>
